@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Health Questionnaire</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+
+    <style>
+      body {
+        background: #f0f0f0; /* Light grey background */
+      }
+
+      /* Form Container */
+      .form-container {
+        max-width: 800px;
+        margin: 50px auto;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 30px;
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-container h2 {
+        font-size: 2.2em;
+        font-weight: bold;
+        color: #2b6aa6;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .btn {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #fff;
+        background: #2b6aa6;
+        border: none;
+        border-radius: 25px;
+      }
+      .btn:hover {
+        background: #367ab6;
+        cursor: pointer;
+      }
+
+      #loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: ;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        font-size: 18px;
+      }
+
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(255, 255, 255, 0.5);
+        border-top: 5px solid #fff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">HealthPal</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </nav>
+
+    <div class="form-container">
+      <h2>Health Questionnaire</h2>
+      <p class="lead">
+        Please fill in the details below to receive personalized health
+        recommendations.
+      </p>
+      <form action="/submit" method="post">
+        <!-- Age and Gender Fields -->
+        <div class="grid-row">
+          <div class="form-group">
+            <label for="age">Age</label>
+            <input
+              type="number"
+              class="form-control"
+              id="age"
+              name="age"
+              min="1"
+              max="120"
+              placeholder="Enter your age"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="gender">Gender</label>
+            <select class="form-control" id="gender" name="gender" required>
+              <option value="" disabled selected>Select your gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Height and Weight Fields -->
+        <div class="grid-row">
+          <div class="form-group">
+            <label for="height">Height (cm)</label>
+            <input
+              type="number"
+              class="form-control"
+              id="height"
+              name="height"
+              placeholder="Enter your height"
+              min="50"
+              max="250"
+              step="0.1"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="weight">Weight (kg)</label>
+            <input
+              type="number"
+              class="form-control"
+              id="weight"
+              name="weight"
+              placeholder="Enter your weight"
+              min="2"
+              max="120"
+              step="0.1"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Heart Rate -->
+        <div class="grid-row">
+          <div class="form-group">
+            <label for="heart-rate">Heart Rate (bpm)</label>
+            <input
+              type="number"
+              class="form-control"
+              id="heart-rate"
+              name="heart-rate"
+              placeholder="Enter your heart rate"
+              min="60"
+              max="120"
+              required
+            />
+          </div>
+
+          <!-- Sleep Hours -->
+          <div class="form-group">
+            <label for="sleep">Average Sleep Hours</label>
+            <input
+              type="number"
+              class="form-control"
+              id="sleep"
+              name="sleep"
+              placeholder="Enter average sleep hours"
+              min="1"
+              max="18"
+              step="0.1"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Physical Activity -->
+        <div class="grid-row">
+          <div class="form-group">
+            <label for="physical-activity">Physical Activity Level</label>
+            <select
+              class="form-control"
+              id="physical-activity"
+              name="physical_activity"
+              required
+            >
+              <option value="" disabled selected>Select an option</option>
+              <option value="sedentary">Sedentary</option>
+              <option value="lightly-active">Lightly Active</option>
+              <option value="moderately-active">Moderately Active</option>
+              <option value="very-active">Very Active</option>
+            </select>
+          </div>
+
+          <!-- Water Intake -->
+          <div class="form-group">
+            <label for="water-intake">Daily Water Intake (liters)</label>
+            <input
+              type="number"
+              class="form-control"
+              id="water-intake"
+              name="water_intake"
+              placeholder="Enter water intake"
+              min="0.5"
+              max="10"
+              step="0.1"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Diet Preferences -->
+        <div class="form-group">
+          <label>Diet Preferences</label>
+          <div class="radio-group" style="display: flex; flex-wrap: wrap">
+            <label style="margin-right: 15px">
+              <input type="radio" id="veg" name="diet" value="Vegetarian" />
+              Vegetarian
+            </label>
+            <label style="margin-right: 15px">
+              <input
+                type="radio"
+                id="nonveg"
+                name="diet"
+                value="Non-Vegetarian"
+              />
+              Non-Vegetarian
+            </label>
+            <label style="margin-right: 15px">
+              <input type="radio" id="vegan" name="diet" value="Vegan" />
+              Vegan
+            </label>
+            <label style="margin-right: 15px">
+              <input type="radio" id="paleo" name="diet" value="Paleo" />
+              Paleo
+            </label>
+            <label style="margin-right: 15px">
+              <input type="radio" id="keto" name="diet" value="Keto" />
+              Keto
+            </label>
+            <label>
+              <input
+                type="radio"
+                id="gluten-free"
+                name="diet"
+                value="Gluten-Free"
+              />
+              Gluten-Free
+            </label>
+          </div>
+        </div>
+
+        <!-- Chronic Conditions -->
+        <div class="grid-row">
+          <div class="form-group">
+            <label for="chronic-conditions"
+              >Do you have any chronic conditions?</label
+            >
+            <select
+              class="form-control"
+              id="chronic-conditions"
+              name="chronic_conditions"
+              required
+            >
+              <option value="" disabled selected>Select an option</option>
+              <option value="none">None</option>
+              <option value="diabetes">Diabetes</option>
+              <option value="hypertension">Hypertension</option>
+              <option value="heart-disease">Heart Disease</option>
+              <option value="asthma">Asthma</option>
+              <option value="arthritis">Arthritis</option>
+            </select>
+          </div>
+
+          <!-- Allergies -->
+          <div class="form-group">
+            <label for="allergies">Do you have any allergies?</label>
+            <select
+              class="form-control"
+              id="allergies"
+              name="allergies"
+              required
+            >
+              <option value="" disabled selected>Select an option</option>
+              <option value="none">None</option>
+              <option value="pollen">Pollen</option>
+              <option value="food">Food</option>
+              <option value="dust">Dust</option>
+              <option value="medication">Medication</option>
+              <option value="pet">Pet</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Smoking -->
+        <div class="grid-row">
+          <div class="form-group">
+            <label for="smoking">Do you smoke?</label>
+            <select class="form-control" id="smoking" name="smoking" required>
+              <option value="" disabled selected>Select an option</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+
+          <!-- Alcohol -->
+          <div class="form-group">
+            <label for="alcohol">Do you consume alcohol?</label>
+            <select class="form-control" id="alcohol" name="alcohol" required>
+              <option value="" disabled selected>Select an option</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+
+    <div id="loading-overlay" class="hidden">
+      <div class="spinner"></div>
+      <p>Tialored recommendations on the way!!..</p>
+    </div>
+
+    <script>
+      document
+        .getElementById("health-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent the default form submission
+          var overlay = document.getElementById("loading-overlay");
+
+          // Show the loading overlay
+          overlay.style.display = "flex";
+
+          // Simulate a delay for loading the dashboard (replace with your actual loading logic)
+          setTimeout(function () {
+            // Now, you can redirect to the dashboard or show the results
+            window.location.href = "/dashboard"; // or however you navigate to your dashboard
+          }, 2000); // 2 seconds (or however long your process takes)
+        });
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
